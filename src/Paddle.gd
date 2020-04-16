@@ -5,7 +5,11 @@ export var size := Vector2(50, 100) setget set_size
 export var color := Color() setget set_color
 export var on_left := false
 
+var last_target_position := Vector2()
 var target_position := Vector2()
+
+func get_vel():
+	return (last_target_position - target_position)
 
 func set_color(new_color):
 	color = new_color
@@ -23,14 +27,23 @@ func _ready():
 	var width: float = ProjectSettings.get_setting("display/window/size/width")
 	var height: float = ProjectSettings.get_setting("display/window/size/height")
 	if on_left:
-		target_position = Vector2(0.0, height/2.0)
+		rotation_degrees = -45
+		target_position = Vector2(width*0.1, height/2.0)
 	else:
-		target_position = Vector2(width, height/2.0)
+		rotation_degrees = 45
+		target_position = Vector2(width*0.9, height/2.0)
 
 func _physics_process(delta):
 	if Engine.editor_hint:
 		return
-	var _vel := move_and_slide((target_position - global_position)/delta)
+	var collision: KinematicCollision2D = move_and_collide(target_position - global_position)
+	if collision != null:
+		if collision.collider.is_in_group("balls"):
+			var ball = collision.collider
+#			ball.vel = Vector2(500.0, 0.0)
+			print("Setting velocity")
+			ball.vel = (last_target_position - target_position).normalized()*(global_position - target_position).length()*5.0
+#	var _vel := move_and_slide((target_position - global_position)/delta)
 
 func _input(event):
 	if Engine.editor_hint:
@@ -38,7 +51,7 @@ func _input(event):
 	if event is InputEventScreenDrag or event is InputEventMouseMotion:
 		var width: float = ProjectSettings.get_setting("display/window/size/width")
 		
-		var new_position = event.position
+		var new_position: Vector2 = event.position
 #		if event is InputEventScreenDrag:
 #			new_position = event.position
 #		elif event is InputEventMouseMotion:
@@ -46,4 +59,6 @@ func _input(event):
 		
 		if on_left and new_position.x < width/2.0 - GameState.central_margin/2.0 or \
 		not on_left and new_position.x >= width/2.0 + GameState.central_margin/2.0:
+			last_target_position = target_position
 			target_position = new_position
+			

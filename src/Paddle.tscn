@@ -5,7 +5,10 @@
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 15, 150 )
 
-[node name="Paddle" type="KinematicBody2D"]
+[node name="Paddle" type="KinematicBody2D" groups=[
+"paddles",
+]]
+rotation = -0.785398
 script = ExtResource( 1 )
 size = Vector2( 30, 300 )
 on_left = true
@@ -18,7 +21,7 @@ margin_left = -15.0
 margin_top = -150.0
 margin_right = 15.0
 margin_bottom = 150.0
-color = Color( 0.94902, 0.933333, 0.854902, 1 )
+color = Color( 0, 0, 0, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
